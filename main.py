@@ -1,6 +1,7 @@
 import csv
 import json
 
+import pandas as pd
 import requests
 
 with open(
@@ -15,19 +16,45 @@ USER_AGENT = "Groovy1.0"
 
 
 def get_top_artist_by_tag(tag):
-    url = f"http://ws.audioscrobbler.com/2.0/?method=tag.gettopartists&tag={tag}&api_key={API_KEY}&format=json"
     headers = {"User-Agent": USER_AGENT}
-    response = requests.get(url, headers=headers)
+    base_url = "http://ws.audioscrobbler.com/2.0/"
+    parametres = {
+        "method": "tag.gettopartists",
+        "tag": tag,
+        "api_key": API_KEY,
+        "format": "json",
+    }
+    try:
+        response = requests.get(base_url, params=parametres, headers=headers)
+        response.raise_for_status()
 
-    if response.status_code == 200:
         data = response.json()
+        print("Donnée récupérée avec succès")
         artists = data["topartists"]["artist"]
-        names = [a["name"] for a in artists]
-        return names
-    else:
-        print(f"Error: {response.status_code}")
+
+        list = []
+
+        for a in artists:
+            nom_a = a["name"]
+            id_unique = a["mbid"]
+            rang = a["@attr"]["rank"]
+
+            artiste_propre = {
+                "Nom": nom_a,
+                "MBID": id_unique,
+                "Rang": int(rang),
+            }
+            list.append(artiste_propre)
+
+        df = pd.DataFrame(list)
+        return df
+
+    except requests.exceptions.Timeout:
+        print("Le serveur a répondu en temps écoulé")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
 
 
-data_brut = get_top_artist_by_tag("jazz")
+data_brut = get_top_artist_by_tag("rock")
 
-print(data_brut)
+print(data_brut.head())
