@@ -19,7 +19,7 @@ def get_top_artist_by_tag(tag):
     headers = {"User-Agent": USER_AGENT}
     base_url = "http://ws.audioscrobbler.com/2.0/"
     parametres = {
-        "method": "tag.gettopartists",
+        "method": "tag.gettoptracks",
         "tag": tag,
         "api_key": API_KEY,
         "format": "json",
@@ -29,14 +29,17 @@ def get_top_artist_by_tag(tag):
         response.raise_for_status()
 
         data = response.json()
+        print(data.keys())
+
+        """
         print("Donnée récupérée avec succès")
-        artists = data["topartists"]["artist"]
+        # artists = data["topartists"]["artist"]
 
         list = []
-
+²
         for a in artists:
             nom_a = a["name"]
-            id_unique = a["mbid"]
+            id_unique = a.get("mbid", None)
             rang = a["@attr"]["rank"]
 
             artiste_propre = {
@@ -46,6 +49,7 @@ def get_top_artist_by_tag(tag):
             }
             list.append(artiste_propre)
 
+        """
         df = pd.DataFrame(list)
         return df
 
@@ -57,4 +61,4 @@ def get_top_artist_by_tag(tag):
 
 data_brut = get_top_artist_by_tag("rock")
 
-print(data_brut.head())
+print(data_brut)
