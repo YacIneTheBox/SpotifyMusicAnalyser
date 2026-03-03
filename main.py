@@ -10,6 +10,9 @@ with open(
     reader = csv.reader(file, delimiter=",")
     # for row in reader:
     # print(row)
+    #
+df_kaggle = pd.read_csv("Ressources/spotify-tracks-dataset.csv")
+print("Colonnes du Csv kaggle :", df_kaggle.columns)
 
 API_KEY = "5dcf90c78b7557abbf9f50cf71943afa"
 USER_AGENT = "Groovy1.0"
@@ -29,7 +32,8 @@ def get_top_artist_by_tag(tag):
         response.raise_for_status()
 
         data = response.json()
-        print(data.keys())
+        # print(data["tracks"]["track"][0].keys())
+        print(json.dumps(data["tracks"]["track"][0], indent=2))
 
         """
         print("Donnée récupérée avec succès")
@@ -49,9 +53,10 @@ def get_top_artist_by_tag(tag):
             }
             list.append(artiste_propre)
 
-        """
+
         df = pd.DataFrame(list)
         return df
+        """
 
     except requests.exceptions.Timeout:
         print("Le serveur a répondu en temps écoulé")
@@ -59,6 +64,5 @@ def get_top_artist_by_tag(tag):
         print(f"Error: {e}")
 
 
-data_brut = get_top_artist_by_tag("rock")
-
-print(data_brut)
+# data_brut = get_top_artist_by_tag("rock")
+# print(data_brut)
